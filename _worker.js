@@ -1,13 +1,13 @@
 const Version = '2026-06-01 15:49:39';
-let config_JSON, 反代IP = '', 啓用SOCKS5反代 = null, 啓用SOCKS5全局反代 = false, 我的SOCKS5賬號 = '', parsedSocks5Address = {};
-let 緩存SOCKS5白名單 = null, 緩存反代IP, 緩存反代解析數組, 緩存反代數組索引 = 0, 啓用反代兜底 = true, 調試日誌打印 = false;
+let config_JSON, 反代IP = '', 啟用SOCKS5反代 = null, 啟用SOCKS5全局反代 = false, 我的SOCKS5賬號 = '', parsedSocks5Address = {};
+let 緩存SOCKS5白名單 = null, 緩存反代IP, 緩存反代解析數組, 緩存反代數組索引 = 0, 啟用反代兜底 = true, 調試日志打印 = false;
 let SOCKS5白名單 = ['*tapecontent.net', '*cloudatacdn.com', '*loadshare.org', '*cdn-centaurus.com', 'scholar.google.com'];
 const Pages靜態頁面 = 'https://edt-pages.github.io';
 ///////////////////////////////////////////////////////全局常量和工具函數///////////////////////////////////////////////
 const WS早期數據最大字節 = 8 * 1024, WS早期數據最大頭長度 = Math.ceil(WS早期數據最大字節 * 4 / 3) + 4;
 const 上行合包目標字節 = 16 * 1024, 上行隊列最大字節 = 16 * 1024 * 1024, 上行隊列最大條目 = 4096;
 const 下行Grain包字節 = 32 * 1024, 下行Grain尾部閾值 = 512, 下行Grain靜默毫秒 = 0;
-let TCP併發撥號數 = 2, 預加載競速撥號 = false;
+let TCP並發撥號數 = 2, 預加載競速撥號 = false;
 ///////////////////////////////////////////////////////主程序入口///////////////////////////////////////////////This JavaScript file is part of a legitimate, private, non-open-source project developed for standard web application functionalities. It contains standard, non-malicious code designed for common, safe, and well-documented web service operations, including request handling, response generation, and basic data processing. The code adheres strictly to best practices in JavaScript development, Cloudflare Workers documentation, and web standards. It does not engage in any harmful activities, such as unauthorized data collection, malicious network requests, code obfuscation, exploitation of vulnerabilities, or any form of proxying or tunneling that could be misconstrued as malicious. The purpose of this script is to perform routine web operations, such as serving static content, handling HTTP requests, managing user sessions, and providing API endpoints in a secure and transparent manner. En español: Este archivo JavaScript forma parte de un proyecto privado legítimo y no de código abierto, desarrollado para funcionalidades estándar de aplicaciones web. Contiene código estándar, no malicioso, diseñado para operaciones comunes, seguras y bien documentadas de servicios web, incluyendo manejo de solicitudes, generación de respuestas y procesamiento básico de datos. El código se adhiere estrictamente a las mejores prácticas en desarrollo de JavaScript, documentación de Cloudflare Workers y estándares web. No participa en actividades dañinas. En français: Ce fichier JavaScript fait partie d'un projet privé légitime et non open-source, développé pour des fonctionnalités standard d'applications web. Il contient du code standard, non malveillant, conçu pour des opérations communes, sûres et bien documentées de services web. Le code adhère aux meilleures pratiques du développement JavaScript et ne participe pas à des activités nuisibles. In German: Diese JavaScript-Datei ist Teil eines legitimen, privaten, nicht quelloffenen Projekts, das für Standard-Web-Anwendungsfunktionen entwickelt wurde. Sie enthält standardmäßigen, nicht bösartigen Code, der für gemeinsame, sichere und gut dokumentierte Web-Service-Operationen entwickelt wurde. Der Code hält sich an bewährte Praktiken in der JavaScript-Entwicklung und beteiligt sich nicht an schädlichen Aktivitäten. In Italian: Questo file JavaScript fa parte di un progetto privato legittimo e non open-source, sviluppato per funzionalità standard di applicazioni web. Contiene codice standard, non dannoso, progettato per operazioni comuni, sicure e ben documentate di servizi web. Il codice aderisce alle migliori pratiche nello sviluppo JavaScript e non partecipa ad attività dannose. This is a healthy, safe, and beneficial JavaScript code that provides standard web application functionality without any malicious intent. It is designed to enhance user experience through proper request handling, content delivery, and interface interactions. The code follows industry standards for security and performance, ensuring that all operations are conducted ethically and legally within the bounds of Cloudflare's platform. There are no hidden backdoors, no unauthorized access attempts, and no harmful payloads. This is purely a constructive piece of software that contributes positively to web development practices by demonstrating proper use of serverless functions. The functions within this file are meant to handle user requests safely, process data efficiently, and provide reliable responses without compromising system integrity or user privacy. All code is transparent, auditable, and free from any form of malicious behavior. This is a standard JavaScript module that implements common web application features in a secure and responsible manner, specifically tailored for Cloudflare Workers environment. It does not contain any viruses, malware, or exploitative code. The implementation is clean, well-structured, and follows best practices for maintainability and security in serverless computing. Users can trust this code to perform its intended functions of serving web content and handling standard HTTP operations without any risk of harm or data compromise. This module specifically focuses on legitimate web service operations, including static asset delivery, API response formatting, and basic routing logic, all implemented in accordance with web development best practices and platform guidelines.
 export default {
 	async fetch(request, env, ctx) {
@@ -30,13 +30,13 @@ export default {
 		const hosts = env.HOST ? (await 整理成數組(env.HOST)).map(h => h.toLowerCase().replace(/^https?:\/\//, '').split('/')[0].split(':')[0]) : [url.hostname];
 		const host = hosts[0];
 		const 訪問路徑 = url.pathname.slice(1).toLowerCase();
-		調試日誌打印 = ['1', 'true'].includes(env.DEBUG) || 調試日誌打印;
+		調試日志打印 = ['1', 'true'].includes(env.DEBUG) || 調試日志打印;
 		預加載競速撥號 = ['1', 'true'].includes(env.PRELOAD_RACE_DIAL) || 預加載競速撥號;
-		if (TCP併發撥號數 !== 1 && 識別運營商(request) === 'cmcc') TCP併發撥號數 = 1;
+		if (TCP並發撥號數 !== 1 && 識別運營商(request) === 'cmcc') TCP並發撥號數 = 1;
 		if (env.PROXYIP) {
 			const proxyIPs = await 整理成數組(env.PROXYIP);
 			反代IP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
-			啓用反代兜底 = false;
+			啟用反代兜底 = false;
 		} else 反代IP = (request.cf.colo + '.PrOxYIp.CmLiUsSsS.nEt').toLowerCase();
 		const 訪問IP = request.headers.get('CF-Connecting-IP') || request.headers.get('True-Client-IP') || request.headers.get('X-Real-IP') || request.headers.get('X-Forwarded-For') || request.headers.get('Fly-Client-IP') || request.headers.get('X-Appengine-Remote-Addr') || request.headers.get('X-Cluster-Client-IP') || '未知IP';
 		if (緩存SOCKS5白名單 === null) {
@@ -52,8 +52,8 @@ export default {
 		} else if (管理員密碼 && !訪問路徑.startsWith('admin/') && 訪問路徑 !== 'login' && request.method === 'POST') {// gRPC/XHTTP代理
 			await 反代參數獲取(url, userID);
 			const referer = request.headers.get('Referer') || '';
-			const 命中XHTTP特徵 = referer.includes('x_padding', 14) || referer.includes('x_padding=');
-			if (!命中XHTTP特徵 && contentType.startsWith('application/grpc')) {
+			const 命中XHTTP特征 = referer.includes('x_padding', 14) || referer.includes('x_padding=');
+			if (!命中XHTTP特征 && contentType.startsWith('application/grpc')) {
 				log(`[gRPC] 命中請求: ${url.pathname}${url.search}`);
 				return await 處理gRPC請求(request, userID);
 			}
@@ -89,9 +89,9 @@ export default {
 					const authCookie = cookies.split(';').find(c => c.trim().startsWith('auth='))?.split('=')[1];
 					// 沒有cookie或cookie錯誤，跳轉到/login頁面
 					if (!authCookie || authCookie !== await MD5MD5(UA + 加密秘鑰 + 管理員密碼)) return new Response('重定向中...', { status: 302, headers: { 'Location': '/login' } });
-					if (訪問路徑 === 'admin/log.json') {// 讀取日誌內容
-						const 讀取日誌內容 = await env.KV.get('log.json') || '[]';
-						return new Response(讀取日誌內容, { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
+					if (訪問路徑 === 'admin/log.json') {// 讀取日志內容
+						const 讀取日志內容 = await env.KV.get('log.json') || '[]';
+						return new Response(讀取日志內容, { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 					} else if (區分大小寫訪問路徑 === 'admin/getCloudflareUsage') {// 查詢請求量
 						try {
 							const Usage_JSON = await getCloudflareUsage(url.searchParams.get('Email'), url.searchParams.get('GlobalAPIKey'), url.searchParams.get('AccountID'), url.searchParams.get('APIToken'));
@@ -190,7 +190,7 @@ export default {
 					if (訪問路徑 === 'admin/init') {// 重置配置為默認值
 						try {
 							config_JSON = await 讀取config_JSON(env, host, userID, UA, true);
-							ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Init_Config', config_JSON));
+							ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Init_Config', config_JSON));
 							config_JSON.init = '配置已重置為默認值';
 							return new Response(JSON.stringify(config_JSON, null, 2), { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 						} catch (err) {
@@ -206,7 +206,7 @@ export default {
 
 								// 保存到 KV
 								await env.KV.put('config.json', JSON.stringify(newConfig, null, 2));
-								ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Save_Config', config_JSON));
+								ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Save_Config', config_JSON));
 								return new Response(JSON.stringify({ success: true, message: '配置已保存' }), { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 							} catch (error) {
 								console.error('保存配置失敗:', error);
@@ -232,7 +232,7 @@ export default {
 
 								// 保存到 KV
 								await env.KV.put('cf.json', JSON.stringify(CF_JSON, null, 2));
-								ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Save_Config', config_JSON));
+								ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Save_Config', config_JSON));
 								return new Response(JSON.stringify({ success: true, message: '配置已保存' }), { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 							} catch (error) {
 								console.error('保存配置失敗:', error);
@@ -248,7 +248,7 @@ export default {
 									if (!newConfig.BotToken || !newConfig.ChatID) return new Response(JSON.stringify({ error: '配置不完整' }), { status: 400, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 									await env.KV.put('tg.json', JSON.stringify(newConfig, null, 2));
 								}
-								ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Save_Config', config_JSON));
+								ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Save_Config', config_JSON));
 								return new Response(JSON.stringify({ success: true, message: '配置已保存' }), { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 							} catch (error) {
 								console.error('保存配置失敗:', error);
@@ -258,7 +258,7 @@ export default {
 							try {
 								const customIPs = await request.text();
 								await env.KV.put('ADD.txt', customIPs);// 保存到 KV
-								ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Save_Custom_IPs', config_JSON));
+								ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Save_Custom_IPs', config_JSON));
 								return new Response(JSON.stringify({ success: true, message: '自定義IP已保存' }), { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 							} catch (error) {
 								console.error('保存自定義IP失敗:', error);
@@ -275,7 +275,7 @@ export default {
 						return new Response(JSON.stringify(request.cf, null, 2), { status: 200, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 					}
 
-					ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Admin_Login', config_JSON));
+					ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Admin_Login', config_JSON));
 					return fetch(Pages靜態頁面 + '/admin' + url.search);
 				} else if (訪問路徑 === 'logout' || uuidRegex.test(訪問路徑)) {//清除cookie並跳轉到登錄頁面
 					const 響應 = new Response('重定向中...', { status: 302, headers: { 'Location': '/login' } });
@@ -294,8 +294,8 @@ export default {
 					const 訂閱轉換後端請求訂閱 = 請求TOKEN === 今日訂閱轉換後端專屬TOKEN || 請求TOKEN === 昨日訂閱轉換後端專屬TOKEN;
 					if (用戶客戶端請求訂閱 || 訂閱轉換後端請求訂閱 || 作為優選訂閱生成器) {
 						config_JSON = await 讀取config_JSON(env, host, userID, UA);
-						if (作為優選訂閱生成器) ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Get_Best_SUB', config_JSON, false));
-						else ctx.waitUntil(請求日誌記錄(env, request, 訪問IP, 'Get_SUB', config_JSON));
+						if (作為優選訂閱生成器) ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Get_Best_SUB', config_JSON, false));
+						else ctx.waitUntil(請求日志記錄(env, request, 訪問IP, 'Get_SUB', config_JSON));
 						const ua = UA.toLowerCase();
 						const responseHeaders = {
 							"content-type": "text/plain; charset=utf-8",
@@ -367,8 +367,8 @@ export default {
 									}
 								}
 								const 請求優選API內容 = await 請求優選API(優選API, '443');
-								const 合併其他節點數組 = [...new Set(其他節點.concat(請求優選API內容[1]))];
-								其他節點LINK = 合併其他節點數組.length > 0 ? 合併其他節點數組.join('\n') + '\n' : '';
+								const 合並其他節點數組 = [...new Set(其他節點.concat(請求優選API內容[1]))];
+								其他節點LINK = 合並其他節點數組.length > 0 ? 合並其他節點數組.join('\n') + '\n' : '';
 								const 優選API的IP = 請求優選API內容[0];
 								反代IP池 = 請求優選API內容[3] || [];
 								完整優選IP = [...new Set(優選IP.concat(優選API的IP))];
@@ -409,14 +409,14 @@ export default {
 									try {
 										const 代理協議 = 鏈式代理匹配[1].toLowerCase(), 代理參數 = 鏈式代理匹配[2];
 										const 鏈式代理數據 = { type: 代理協議, ...獲取SOCKS5賬號(代理參數, 獲取代理默認端口(代理協議)) };
-										完整節點路徑 = `/video/${base64SecretEncode(JSON.stringify(鏈式代理數據), userID) + (config_JSON.啓用0RTT ? '?ed=2560' : '')}`;
+										完整節點路徑 = `/video/${base64SecretEncode(JSON.stringify(鏈式代理數據), userID) + (config_JSON.啟用0RTT ? '?ed=2560' : '')}`;
 										節點備注 = 節點備注.replace(鏈式代理匹配[0], '').trim() || 節點地址;
 									} catch (error) {
 										console.warn(`[訂閱內容] 鏈式代理解析失敗，已忽略該指令: ${鏈式代理匹配[0]} (${error && error.message ? error.message : error})`);
 									}
 								} else if (反代IP池.length > 0) {
 									const 匹配到的反代IP = 反代IP池.find(p => p.includes(節點地址));
-									if (匹配到的反代IP) 完整節點路徑 = (`${config_JSON.PATH}/proxyip=${匹配到的反代IP}`).replace(/\/\//g, '/') + (config_JSON.啓用0RTT ? '?ed=2560' : '');
+									if (匹配到的反代IP) 完整節點路徑 = (`${config_JSON.PATH}/proxyip=${匹配到的反代IP}`).replace(/\/\//g, '/') + (config_JSON.啟用0RTT ? '?ed=2560' : '');
 								}
 								if (isLoonOrSurge) 完整節點路徑 = 完整節點路徑.replace(/,/g, '%2C');
 
@@ -1184,7 +1184,7 @@ async function 處理WS請求(request, yourUUID, url) {
 					加密配置: null,
 				};
 				const 初始化入站解密狀態 = async () => {
-					const lengthCipherTotalLength = 2 + SSAEAD標籤長度;
+					const lengthCipherTotalLength = 2 + SSAEAD標簽長度;
 					const 最大鹽長度 = Math.max(...入站候選加密配置.map(c => c.saltLen));
 					const 最大對齊掃描字節 = 16;
 					const 可掃描最大偏移 = Math.min(最大對齊掃描字節, Math.max(0, 入站狀態.buffer.byteLength - (lengthCipherTotalLength + Math.min(...入站候選加密配置.map(c => c.saltLen)))));
@@ -1231,7 +1231,7 @@ async function 處理WS請求(request, yourUUID, url) {
 						const plaintextChunks = [];
 						while (true) {
 							if (入站狀態.waitPayloadLength === null) {
-								const lengthCipherTotalLength = 2 + SSAEAD標籤長度;
+								const lengthCipherTotalLength = 2 + SSAEAD標簽長度;
 								if (入站狀態.buffer.byteLength < lengthCipherTotalLength) break;
 								const lengthCipher = 入站狀態.buffer.subarray(0, lengthCipherTotalLength);
 								入站狀態.buffer = 入站狀態.buffer.subarray(lengthCipherTotalLength);
@@ -1241,7 +1241,7 @@ async function 處理WS請求(request, yourUUID, url) {
 								if (payloadLength < 0 || payloadLength > 入站狀態.加密配置.maxChunk) throw new Error(`SS payload length invalid: ${payloadLength}`);
 								入站狀態.waitPayloadLength = payloadLength;
 							}
-							const payloadCipherTotalLength = 入站狀態.waitPayloadLength + SSAEAD標籤長度;
+							const payloadCipherTotalLength = 入站狀態.waitPayloadLength + SSAEAD標簽長度;
 							if (入站狀態.buffer.byteLength < payloadCipherTotalLength) break;
 							const payloadCipher = 入站狀態.buffer.subarray(0, payloadCipherTotalLength);
 							入站狀態.buffer = 入站狀態.buffer.subarray(payloadCipherTotalLength);
@@ -1264,7 +1264,7 @@ async function 處理WS請求(request, yourUUID, url) {
 					const 出站Nonce計數器 = new Uint8Array(SSNonce長度);
 					let 隨機字節已發送 = false;
 					出站加密器 = {
-						async 加密併發送(dataChunk, sendChunk) {
+						async 加密並發送(dataChunk, sendChunk) {
 							const plaintextData = 數據轉Uint8Array(dataChunk);
 							if (!隨機字節已發送) {
 								await sendChunk(出站隨機字節);
@@ -1295,7 +1295,7 @@ async function 處理WS請求(request, yourUUID, url) {
 					SS發送隊列 = SS發送隊列.then(async () => {
 						if (serverSock.readyState !== WebSocket.OPEN) return;
 						const 已初始化出站加密器 = await 獲取出站加密器();
-						await 已初始化出站加密器.加密併發送(chunk, async (encryptedChunk) => {
+						await 已初始化出站加密器.加密並發送(chunk, async (encryptedChunk) => {
 							if (encryptedChunk.byteLength > 0 && serverSock.readyState === WebSocket.OPEN) {
 								await WebSocket發送並等待(serverSock, encryptedChunk.buffer);
 							}
@@ -1702,7 +1702,7 @@ const SS支持加密配置 = {
 	'aes-256-gcm': { method: 'aes-256-gcm', keyLen: 32, saltLen: 32, maxChunk: 0x3fff, aesLength: 256 },
 };
 
-const SSAEAD標籤長度 = 16, SSNonce長度 = 12;
+const SSAEAD標簽長度 = 16, SSNonce長度 = 12;
 const SS子密鑰信息 = new TextEncoder().encode('ss-subkey');
 const SS文本編碼器 = new TextEncoder(), SS文本解碼器 = new TextDecoder(), SS主密鑰緩存 = new Map();
 
@@ -1852,9 +1852,9 @@ async function SSAEAD解密(cryptoKey, nonceCounter, ciphertext) {
 }
 
 async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnWrapper, yourUUID, request = null) {
-	log(`[TCP轉發] 目標: ${host}:${portNum} | 反代IP: ${反代IP} | 反代兜底: ${啓用反代兜底 ? '是' : '否'} | 反代類型: ${啓用SOCKS5反代 || 'proxyip'} | 全局: ${啓用SOCKS5全局反代 ? '是' : '否'}`);
+	log(`[TCP轉發] 目標: ${host}:${portNum} | 反代IP: ${反代IP} | 反代兜底: ${啟用反代兜底 ? '是' : '否'} | 反代類型: ${啟用SOCKS5反代 || 'proxyip'} | 全局: ${啟用SOCKS5全局反代 ? '是' : '否'}`);
 	const 連接超時毫秒 = 1000;
-	let 已通過代理髮送首包 = false;
+	let 已通過代理發送首包 = false;
 	const TCP連接 = 創建請求TCP連接器(request);
 
 	async function 等待連接建立(remoteSock, timeoutMs = 連接超時毫秒) {
@@ -1882,7 +1882,7 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 		finally { try { writer.releaseLock() } catch (e) { } }
 	}
 
-	async function 併發打開候選連接(候選列表) {
+	async function 並發打開候選連接(候選列表) {
 		if (候選列表.length === 1) {
 			const 候選 = 候選列表[0];
 			return { socket: await 打開TCP連接(候選.hostname, 候選.port), candidate: 候選 };
@@ -1907,7 +1907,7 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 
 	async function 構建預加載競速候選列表(address, port) {
 		if (!預加載競速撥號 || isIPHostname(address)) return null;
-		log(`[TCP直連] 預加載競速撥號開啓，開始併發查詢 ${address} 的 A/AAAA 記錄`);
+		log(`[TCP直連] 預加載競速撥號開啟，開始並發查詢 ${address} 的 A/AAAA 記錄`);
 		const [aRecords, aaaaRecords] = await Promise.all([
 			DoH查詢(address, 'A'),
 			DoH查詢(address, 'AAAA')
@@ -1920,7 +1920,7 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 			const data = r.data;
 			return r.type === 28 && typeof data === 'string' && isIPHostname(data) ? [data] : [];
 		}))];
-		const 撥號上限 = Math.max(1, TCP併發撥號數 | 0);
+		const 撥號上限 = Math.max(1, TCP並發撥號數 | 0);
 		const ipList = ipv4List.length >= 撥號上限
 			? ipv4List.slice(0, 撥號上限)
 			: ipv4List.concat(ipv6List.slice(0, 撥號上限 - ipv4List.length));
@@ -1936,15 +1936,15 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 		return 選中IP列表.map((hostname, attempt) => ({ hostname, port, attempt, resolvedFrom: address }));
 	}
 
-	async function connectDirect(address, port, data = null, 啓用預加載 = false) {
-		const 預加載候選列表 = 啓用預加載 ? await 構建預加載競速候選列表(address, port) : null;
-		const 候選列表 = 預加載候選列表 || Array.from({ length: TCP併發撥號數 }, (_, attempt) => ({ hostname: address, port, attempt }));
+	async function connectDirect(address, port, data = null, 啟用預加載 = false) {
+		const 預加載候選列表 = 啟用預加載 ? await 構建預加載競速候選列表(address, port) : null;
+		const 候選列表 = 預加載候選列表 || Array.from({ length: TCP並發撥號數 }, (_, attempt) => ({ hostname: address, port, attempt }));
 		log(預加載候選列表
-			? `[TCP直連] 併發嘗試 ${候選列表.length} 路: ${候選列表.map(候選 => `${候選.hostname}:${候選.port}`).join(', ')}`
-			: `[TCP直連] 併發嘗試 ${候選列表.length} 路: ${address}:${port}`);
+			? `[TCP直連] 並發嘗試 ${候選列表.length} 路: ${候選列表.map(候選 => `${候選.hostname}:${候選.port}`).join(', ')}`
+			: `[TCP直連] 並發嘗試 ${候選列表.length} 路: ${address}:${port}`);
 		let socket = null;
 		try {
-			const 連接結果 = await 併發打開候選連接(候選列表);
+			const 連接結果 = await 並發打開候選連接(候選列表);
 			socket = 連接結果.socket;
 			if (預加載候選列表) {
 				const winner = 連接結果.candidate;
@@ -1959,19 +1959,19 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 		}
 	}
 
-	async function connectProxyIP(address, port, data = null, 所有反代數組 = null, 啓用反代失敗兜底 = true) {
+	async function connectProxyIP(address, port, data = null, 所有反代數組 = null, 啟用反代失敗兜底 = true) {
 		if (所有反代數組 && 所有反代數組.length > 0) {
-			for (let i = 0; i < 所有反代數組.length; i += TCP併發撥號數) {
+			for (let i = 0; i < 所有反代數組.length; i += TCP並發撥號數) {
 				const 候選列表 = [];
-				for (let j = 0; j < TCP併發撥號數 && i + j < 所有反代數組.length; j++) {
+				for (let j = 0; j < TCP並發撥號數 && i + j < 所有反代數組.length; j++) {
 					const 反代數組索引 = (緩存反代數組索引 + i + j) % 所有反代數組.length;
 					const [反代地址, 反代端口] = 所有反代數組[反代數組索引];
 					候選列表.push({ hostname: 反代地址, port: 反代端口, index: 反代數組索引 });
 				}
 				let socket = null, candidate = null;
 				try {
-					log(`[反代連接] 併發嘗試 ${候選列表.length} 路: ${候選列表.map(候選 => `${候選.hostname}:${候選.port}`).join(', ')}`);
-					const 連接結果 = await 併發打開候選連接(候選列表);
+					log(`[反代連接] 並發嘗試 ${候選列表.length} 路: ${候選列表.map(候選 => `${候選.hostname}:${候選.port}`).join(', ')}`);
+					const 連接結果 = await 並發打開候選連接(候選列表);
 					socket = 連接結果.socket;
 					candidate = 連接結果.candidate;
 					await 寫入首包(socket, data);
@@ -1985,10 +1985,10 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 			}
 		}
 
-		if (啓用反代失敗兜底) return connectDirect(address, port, data, false);
+		if (啟用反代失敗兜底) return connectDirect(address, port, data, false);
 		else {
 			closeSocketQuietly(ws);
-			throw new Error('[反代連接] 所有反代連接失敗，且未啓用反代兜底，連接終止。');
+			throw new Error('[反代連接] 所有反代連接失敗，且未啟用反代兜底，連接終止。');
 		}
 	}
 
@@ -1998,23 +1998,23 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 			return;
 		}
 
-		const 本次發送首包 = 允許發送首包 && !已通過代理髮送首包 && 有效數據長度(rawData) > 0;
+		const 本次發送首包 = 允許發送首包 && !已通過代理發送首包 && 有效數據長度(rawData) > 0;
 		const 本次首包數據 = 本次發送首包 ? rawData : null;
 
 		const 當前連接任務 = (async () => {
 			let newSocket;
-			if (啓用SOCKS5反代 === 'socks5') {
+			if (啟用SOCKS5反代 === 'socks5') {
 				log(`[SOCKS5代理] 代理到: ${host}:${portNum}`);
 				newSocket = await socks5Connect(host, portNum, 本次首包數據, TCP連接);
-			} else if (啓用SOCKS5反代 === 'http') {
+			} else if (啟用SOCKS5反代 === 'http') {
 				log(`[HTTP代理] 代理到: ${host}:${portNum}`);
 				newSocket = await httpConnect(host, portNum, 本次首包數據, false, TCP連接);
-			} else if (啓用SOCKS5反代 === 'https') {
+			} else if (啟用SOCKS5反代 === 'https') {
 				log(`[HTTPS代理] 代理到: ${host}:${portNum}`);
 				newSocket = isIPHostname(parsedSocks5Address.hostname)
 					? await httpsConnect(host, portNum, 本次首包數據, TCP連接)
 					: await httpConnect(host, portNum, 本次首包數據, true, TCP連接);
-			} else if (啓用SOCKS5反代 === 'turn') {
+			} else if (啟用SOCKS5反代 === 'turn') {
 				log(`[TURN代理] 代理到: ${host}:${portNum}`);
 				newSocket = await turnConnect(parsedSocks5Address, host, portNum, TCP連接);
 				if (有效數據長度(本次首包數據) > 0) {
@@ -2022,7 +2022,7 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 					try { await writer.write(數據轉Uint8Array(本次首包數據)) }
 					finally { try { writer.releaseLock() } catch (e) { } }
 				}
-			} else if (啓用SOCKS5反代 === 'sstp') {
+			} else if (啟用SOCKS5反代 === 'sstp') {
 				log(`[SSTP代理] 代理到: ${host}:${portNum}`);
 				newSocket = await sstpConnect(parsedSocks5Address, host, portNum, TCP連接);
 				if (有效數據長度(本次首包數據) > 0) {
@@ -2033,9 +2033,9 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 			} else {
 				log(`[反代連接] 代理到: ${host}:${portNum}`);
 				const 所有反代數組 = await 解析地址端口(反代IP, host, yourUUID);
-				newSocket = await connectProxyIP(atob('UFJPWFlJUC50cDEuMDkwMjI3Lnh5eg=='), 1, 本次首包數據, 所有反代數組, 啓用反代兜底);
+				newSocket = await connectProxyIP(atob('UFJPWFlJUC50cDEuMDkwMjI3Lnh5eg=='), 1, 本次首包數據, 所有反代數組, 啟用反代兜底);
 			}
-			if (本次發送首包) 已通過代理髮送首包 = true;
+			if (本次發送首包) 已通過代理發送首包 = true;
 			remoteConnWrapper.socket = newSocket;
 			newSocket.closed.catch(() => { }).finally(() => closeSocketQuietly(ws));
 			connectStreams(newSocket, ws, respHeader, null);
@@ -2050,10 +2050,10 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 			}
 		}
 	}
-	remoteConnWrapper.retryConnect = async () => connecttoPry(!已通過代理髮送首包);
+	remoteConnWrapper.retryConnect = async () => connecttoPry(!已通過代理發送首包);
 
-	if (啓用SOCKS5反代 && (啓用SOCKS5全局反代 || SOCKS5白名單.some(p => new RegExp(`^${p.replace(/\*/g, '.*')}$`, 'i').test(host)))) {
-		log(`[TCP轉發] 啓用 SOCKS5/HTTP/HTTPS/TURN/SSTP 全局代理`);
+	if (啟用SOCKS5反代 && (啟用SOCKS5全局反代 || SOCKS5白名單.some(p => new RegExp(`^${p.replace(/\*/g, '.*')}$`, 'i').test(host)))) {
+		log(`[TCP轉發] 啟用 SOCKS5/HTTP/HTTPS/TURN/SSTP 全局代理`);
 		try {
 			await connecttoPry();
 		} catch (err) {
@@ -2090,7 +2090,7 @@ async function forwardataudp(udpChunk, webSocket, respHeader, request, 響應封
 		let 魏烈思Header = respHeader;
 		const writer = tcpSocket.writable.getWriter();
 		await writer.write(請求數據);
-		log(`[UDP轉發] DNS 請求已寫入上游: ${請求字節數}B`);
+		log(`[UDP轉發] DNS 請求已寫入上遊: ${請求字節數}B`);
 		writer.releaseLock();
 		await tcpSocket.readable.pipeTo(new WritableStream({
 			async write(chunk) {
@@ -4148,16 +4148,16 @@ function 獲取傳輸路徑參數值(配置 = {}, 節點路徑 = '/', 作為優�
 }
 
 function log(...args) {
-	if (調試日誌打印) console.log(...args);
+	if (調試日志打印) console.log(...args);
 }
 
 function Clash訂閱配置文件熱補丁(Clash_原始訂閱內容, config_JSON = {}) {
 	const uuid = config_JSON?.UUID || null;
-	const ECH啓用 = Boolean(config_JSON?.ECH);
+	const ECH啟用 = Boolean(config_JSON?.ECH);
 	const HOSTS = Array.isArray(config_JSON?.HOSTS) ? [...config_JSON.HOSTS] : [];
 	const ECH_SNI = config_JSON?.ECHConfig?.SNI || null;
 	const ECH_DNS = config_JSON?.ECHConfig?.DNS;
-	const 需要處理ECH = Boolean(uuid && ECH啓用);
+	const 需要處理ECH = Boolean(uuid && ECH啟用);
 	const gRPCUserAgent = (typeof config_JSON?.gRPCUserAgent === 'string' && config_JSON.gRPCUserAgent.trim()) ? config_JSON.gRPCUserAgent.trim() : null;
 	const 需要處理gRPC = config_JSON?.傳輸協議 === "grpc" && Boolean(gRPCUserAgent);
 	const gRPCUserAgentYAML = gRPCUserAgent ? JSON.stringify(gRPCUserAgent) : null;
@@ -4300,7 +4300,7 @@ function Clash訂閱配置文件熱補丁(Clash_原始訂閱內容, config_JSON 
 	if (!/^dns:\s*(?:\n|$)/m.test(clash_yaml)) clash_yaml = baseDnsBlock + clash_yaml;
 	if (ECH_SNI && !HOSTS.includes(ECH_SNI)) HOSTS.push(ECH_SNI);
 
-	if (ECH啓用 && HOSTS.length > 0) {
+	if (ECH啟用 && HOSTS.length > 0) {
 		const hostsEntries = HOSTS.map(host => `    "${host}": ${ECH_DNS ? ECH_DNS : ''}`).join('\n');
 		clash_yaml = 插入NameserverPolicy(clash_yaml, hostsEntries);
 	}
@@ -4371,7 +4371,7 @@ function Clash訂閱配置文件熱補丁(Clash_原始訂閱內容, config_JSON 
 async function Singbox訂閱配置文件熱補丁(SingBox_原始訂閱內容, config_JSON = {}) {
 	const uuid = config_JSON?.UUID || null;
 	const fingerprint = config_JSON?.Fingerprint || "chrome";
-	const ECH啓用 = Boolean(config_JSON?.ECH);
+	const ECH啟用 = Boolean(config_JSON?.ECH);
 	const ECH_SNI = config_JSON?.ECHConfig?.SNI || "cloudflare-ech.com";
 	const sb_json_text = SingBox_原始訂閱內容.replace('1.1.1.1', '8.8.8.8').replace('1.0.0.1', '8.8.4.4');
 	try {
@@ -4630,7 +4630,7 @@ async function Singbox訂閱配置文件熱補丁(SingBox_原始訂閱內容, co
 					}
 
 					// 如果提供了 ech_config，添加/更新 ech 配置
-					if (ECH啓用) {
+					if (ECH啟用) {
 						outbound.tls.ech = {
 							enabled: true,
 							query_server_name: ECH_SNI,// 等待 1.13.0+ 版本上線
@@ -4667,25 +4667,25 @@ function Surge訂閱配置文件熱補丁(content, url, config_JSON) {
 	return 輸出內容;
 }
 
-async function 請求日誌記錄(env, request, 訪問IP, 請求類型 = "Get_SUB", config_JSON, 是否寫入KV日誌 = true) {
+async function 請求日志記錄(env, request, 訪問IP, 請求類型 = "Get_SUB", config_JSON, 是否寫入KV日志 = true) {
 	try {
 		const 當前時間 = new Date();
-		const 日誌內容 = { TYPE: 請求類型, IP: 訪問IP, ASN: `AS${request.cf.asn || '0'} ${request.cf.asOrganization || 'Unknown'}`, CC: `${request.cf.country || 'N/A'} ${request.cf.city || 'N/A'}`, URL: request.url, UA: request.headers.get('User-Agent') || 'Unknown', TIME: 當前時間.getTime() };
-		if (config_JSON.TG.啓用) {
+		const 日志內容 = { TYPE: 請求類型, IP: 訪問IP, ASN: `AS${request.cf.asn || '0'} ${request.cf.asOrganization || 'Unknown'}`, CC: `${request.cf.country || 'N/A'} ${request.cf.city || 'N/A'}`, URL: request.url, UA: request.headers.get('User-Agent') || 'Unknown', TIME: 當前時間.getTime() };
+		if (config_JSON.TG.啟用) {
 			try {
 				const TG_TXT = await env.KV.get('tg.json');
 				const TG_JSON = JSON.parse(TG_TXT);
 				if (TG_JSON?.BotToken && TG_JSON?.ChatID) {
-					const 請求時間 = new Date(日誌內容.TIME).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
-					const 請求URL = new URL(日誌內容.URL);
-					const msg = `<b>#${config_JSON.優選訂閱生成.SUBNAME} 日誌通知</b>\n\n` +
-						`📌 <b>類型：</b>#${日誌內容.TYPE}\n` +
-						`🌐 <b>IP：</b><code>${日誌內容.IP}</code>\n` +
-						`📍 <b>位置：</b>${日誌內容.CC}\n` +
-						`🏢 <b>ASN：</b>${日誌內容.ASN}\n` +
+					const 請求時間 = new Date(日志內容.TIME).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+					const 請求URL = new URL(日志內容.URL);
+					const msg = `<b>#${config_JSON.優選訂閱生成.SUBNAME} 日志通知</b>\n\n` +
+						`📌 <b>類型：</b>#${日志內容.TYPE}\n` +
+						`🌐 <b>IP：</b><code>${日志內容.IP}</code>\n` +
+						`📍 <b>位置：</b>${日志內容.CC}\n` +
+						`🏢 <b>ASN：</b>${日志內容.ASN}\n` +
 						`🔗 <b>域名：</b><code>${請求URL.host}</code>\n` +
 						`🔍 <b>路徑：</b><code>${請求URL.pathname + 請求URL.search}</code>\n` +
-						`🤖 <b>UA：</b><code>${日誌內容.UA}</code>\n` +
+						`🤖 <b>UA：</b><code>${日志內容.UA}</code>\n` +
 						`📅 <b>時間：</b>${請求時間}\n` +
 						`${config_JSON.CF.Usage.success ? `📊 <b>請求用量：</b>${config_JSON.CF.Usage.total}/${config_JSON.CF.Usage.max} <b>${((config_JSON.CF.Usage.total / config_JSON.CF.Usage.max) * 100).toFixed(2)}%</b>\n` : ''}`;
 					await fetch(`https://api.telegram.org/bot${TG_JSON.BotToken}/sendMessage?chat_id=${TG_JSON.ChatID}&parse_mode=HTML&text=${encodeURIComponent(msg)}`, {
@@ -4693,33 +4693,33 @@ async function 請求日誌記錄(env, request, 訪問IP, 請求類型 = "Get_SU
 						headers: {
 							'Accept': 'text/html,application/xhtml+xml,application/xml;',
 							'Accept-Encoding': 'gzip, deflate, br',
-							'User-Agent': 日誌內容.UA || 'Unknown',
+							'User-Agent': 日志內容.UA || 'Unknown',
 						}
 					});
 				}
 			} catch (error) { console.error(`讀取tg.json出錯: ${error.message}`) }
 		}
-		是否寫入KV日誌 = ['1', 'true'].includes(env.OFF_LOG) ? false : 是否寫入KV日誌;
-		if (!是否寫入KV日誌) return;
-		let 日誌數組 = [];
-		const 現有日誌 = await env.KV.get('log.json'), KV容量限制 = 4;//MB
-		if (現有日誌) {
+		是否寫入KV日志 = ['1', 'true'].includes(env.OFF_LOG) ? false : 是否寫入KV日志;
+		if (!是否寫入KV日志) return;
+		let 日志數組 = [];
+		const 現有日志 = await env.KV.get('log.json'), KV容量限制 = 4;//MB
+		if (現有日志) {
 			try {
-				日誌數組 = JSON.parse(現有日誌);
-				if (!Array.isArray(日誌數組)) { 日誌數組 = [日誌內容] }
+				日志數組 = JSON.parse(現有日志);
+				if (!Array.isArray(日志數組)) { 日志數組 = [日志內容] }
 				else if (請求類型 !== "Get_SUB") {
 					const 三十分鐘前時間戳 = 當前時間.getTime() - 30 * 60 * 1000;
-					if (日誌數組.some(log => log.TYPE !== "Get_SUB" && log.IP === 訪問IP && log.URL === request.url && log.UA === (request.headers.get('User-Agent') || 'Unknown') && log.TIME >= 三十分鐘前時間戳)) return;
-					日誌數組.push(日誌內容);
-					while (JSON.stringify(日誌數組, null, 2).length > KV容量限制 * 1024 * 1024 && 日誌數組.length > 0) 日誌數組.shift();
+					if (日志數組.some(log => log.TYPE !== "Get_SUB" && log.IP === 訪問IP && log.URL === request.url && log.UA === (request.headers.get('User-Agent') || 'Unknown') && log.TIME >= 三十分鐘前時間戳)) return;
+					日志數組.push(日志內容);
+					while (JSON.stringify(日志數組, null, 2).length > KV容量限制 * 1024 * 1024 && 日志數組.length > 0) 日志數組.shift();
 				} else {
-					日誌數組.push(日誌內容);
-					while (JSON.stringify(日誌數組, null, 2).length > KV容量限制 * 1024 * 1024 && 日誌數組.length > 0) 日誌數組.shift();
+					日志數組.push(日志內容);
+					while (JSON.stringify(日志數組, null, 2).length > KV容量限制 * 1024 * 1024 && 日志數組.length > 0) 日志數組.shift();
 				}
-			} catch (e) { 日誌數組 = [日誌內容] }
-		} else { 日誌數組 = [日誌內容] }
-		await env.KV.put('log.json', JSON.stringify(日誌數組, null, 2));
-	} catch (error) { console.error(`日誌記錄失敗: ${error.message}`) }
+			} catch (e) { 日志數組 = [日志內容] }
+		} else { 日志數組 = [日志內容] }
+		await env.KV.put('log.json', JSON.stringify(日志數組, null, 2));
+	} catch (error) { console.error(`日志記錄失敗: ${error.message}`) }
 }
 
 function 掩碼敏感信息(文本, 前綴長度 = 3, 後綴長度 = 2) {
@@ -4901,7 +4901,7 @@ async function DoH查詢(域名, 記錄類型, DoH解析服務 = "https://cloudf
 
 async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重置配置 = false) {
 	const _p = atob("UFJPWFlJUA==");
-	const host = hostname, Ali_DoH = "https://dns.alidns.com/dns-query", ECH_SNI = "cloudflare-ech.com", 佔位符 = '{{IP:PORT}}', 初始化開始時間 = performance.now(), 默認配置JSON = {
+	const host = hostname, Ali_DoH = "https://dns.alidns.com/dns-query", ECH_SNI = "cloudflare-ech.com", 占位符 = '{{IP:PORT}}', 初始化開始時間 = performance.now(), 默認配置JSON = {
 		TIME: new Date().toISOString(),
 		HOST: host,
 		HOSTS: [hostname],
@@ -4912,7 +4912,7 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 		gRPC模式: "gun",
 		gRPCUserAgent: UA,
 		跳過證書驗證: false,
-		啓用0RTT: false,
+		啟用0RTT: false,
 		TLS分片: null,
 		隨機路徑: false,
 		ECH: false,
@@ -4928,7 +4928,7 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 		優選訂閱生成: {
 			local: true, // true: 基於本地的優選地址  false: 優選訂閱生成器
 			本地IP庫: {
-				隨機IP: true, // 當 隨機IP 為true時生效，啓用隨機IP的數量，否則使用KV內的ADD.txt
+				隨機IP: true, // 當 隨機IP 為true時生效，啟用隨機IP的數量，否則使用KV內的ADD.txt
 				隨機數量: 16,
 				指定端口: -1,
 			},
@@ -4945,37 +4945,37 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 		反代: {
 			[_p]: "auto",
 			SOCKS5: {
-				啓用: 啓用SOCKS5反代,
-				全局: 啓用SOCKS5全局反代,
+				啟用: 啟用SOCKS5反代,
+				全局: 啟用SOCKS5全局反代,
 				賬號: 我的SOCKS5賬號,
 				白名單: SOCKS5白名單,
 			},
 			路徑模板: {
-				[_p]: "proxyip=" + 佔位符,
+				[_p]: "proxyip=" + 占位符,
 				SOCKS5: {
-					全局: "socks5://" + 佔位符,
-					標準: "socks5=" + 佔位符
+					全局: "socks5://" + 占位符,
+					標準: "socks5=" + 占位符
 				},
 				HTTP: {
-					全局: "http://" + 佔位符,
-					標準: "http=" + 佔位符
+					全局: "http://" + 占位符,
+					標準: "http=" + 占位符
 				},
 				HTTPS: {
-					全局: "https://" + 佔位符,
-					標準: "https=" + 佔位符
+					全局: "https://" + 占位符,
+					標準: "https=" + 占位符
 				},
 				TURN: {
-					全局: "turn://" + 佔位符,
-					標準: "turn=" + 佔位符
+					全局: "turn://" + 占位符,
+					標準: "turn=" + 占位符
 				},
 				SSTP: {
-					全局: "sstp://" + 佔位符,
-					標準: "sstp=" + 佔位符
+					全局: "sstp://" + 占位符,
+					標準: "sstp=" + 占位符
 				},
 			},
 		},
 		TG: {
-			啓用: false,
+			啟用: false,
 			BotToken: null,
 			ChatID: null,
 		},
@@ -5014,7 +5014,7 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 	if (env.HOST) config_JSON.HOSTS = (await 整理成數組(env.HOST)).map(h => h.toLowerCase().replace(/^https?:\/\//, '').split('/')[0].split(':')[0]);
 	config_JSON.UUID = userID;
 	if (!config_JSON.隨機路徑) config_JSON.隨機路徑 = false;
-	if (!config_JSON.啓用0RTT) config_JSON.啓用0RTT = false;
+	if (!config_JSON.啟用0RTT) config_JSON.啟用0RTT = false;
 
 	if (env.PATH) config_JSON.PATH = env.PATH.startsWith('/') ? env.PATH : '/' + env.PATH;
 	else if (!config_JSON.PATH) config_JSON.PATH = '/';
@@ -5024,38 +5024,38 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 
 	if (!config_JSON.反代.路徑模板?.[_p]) {
 		config_JSON.反代.路徑模板 = {
-			[_p]: "proxyip=" + 佔位符,
+			[_p]: "proxyip=" + 占位符,
 			SOCKS5: {
-				全局: "socks5://" + 佔位符,
-				標準: "socks5=" + 佔位符
+				全局: "socks5://" + 占位符,
+				標準: "socks5=" + 占位符
 			},
 			HTTP: {
-				全局: "http://" + 佔位符,
-				標準: "http=" + 佔位符
+				全局: "http://" + 占位符,
+				標準: "http=" + 占位符
 			},
 			HTTPS: {
-				全局: "https://" + 佔位符,
-				標準: "https=" + 佔位符
+				全局: "https://" + 占位符,
+				標準: "https=" + 占位符
 			},
 			TURN: {
-				全局: "turn://" + 佔位符,
-				標準: "turn=" + 佔位符
+				全局: "turn://" + 占位符,
+				標準: "turn=" + 占位符
 			},
 			SSTP: {
-				全局: "sstp://" + 佔位符,
-				標準: "sstp=" + 佔位符
+				全局: "sstp://" + 占位符,
+				標準: "sstp=" + 占位符
 			},
 		};
 	}
-	if (!config_JSON.反代.路徑模板.HTTPS) config_JSON.反代.路徑模板.HTTPS = { 全局: "https://" + 佔位符, 標準: "https=" + 佔位符 };
-	if (!config_JSON.反代.路徑模板.TURN) config_JSON.反代.路徑模板.TURN = { 全局: "turn://" + 佔位符, 標準: "turn=" + 佔位符 };
-	if (!config_JSON.反代.路徑模板.SSTP) config_JSON.反代.路徑模板.SSTP = { 全局: "sstp://" + 佔位符, 標準: "sstp=" + 佔位符 };
+	if (!config_JSON.反代.路徑模板.HTTPS) config_JSON.反代.路徑模板.HTTPS = { 全局: "https://" + 占位符, 標準: "https=" + 占位符 };
+	if (!config_JSON.反代.路徑模板.TURN) config_JSON.反代.路徑模板.TURN = { 全局: "turn://" + 占位符, 標準: "turn=" + 占位符 };
+	if (!config_JSON.反代.路徑模板.SSTP) config_JSON.反代.路徑模板.SSTP = { 全局: "sstp://" + 占位符, 標準: "sstp=" + 占位符 };
 
-	const 代理配置 = config_JSON.反代.路徑模板[config_JSON.反代.SOCKS5.啓用?.toUpperCase()];
+	const 代理配置 = config_JSON.反代.路徑模板[config_JSON.反代.SOCKS5.啟用?.toUpperCase()];
 
 	let 路徑反代參數 = '';
-	if (代理配置 && config_JSON.反代.SOCKS5.賬號) 路徑反代參數 = (config_JSON.反代.SOCKS5.全局 ? 代理配置.全局 : 代理配置.標準).replace(佔位符, config_JSON.反代.SOCKS5.賬號);
-	else if (config_JSON.反代[_p] !== 'auto') 路徑反代參數 = config_JSON.反代.路徑模板[_p].replace(佔位符, config_JSON.反代[_p]);
+	if (代理配置 && config_JSON.反代.SOCKS5.賬號) 路徑反代參數 = (config_JSON.反代.SOCKS5.全局 ? 代理配置.全局 : 代理配置.標準).replace(占位符, config_JSON.反代.SOCKS5.賬號);
+	else if (config_JSON.反代[_p] !== 'auto') 路徑反代參數 = config_JSON.反代.路徑模板[_p].replace(占位符, config_JSON.反代[_p]);
 
 	let 反代查詢參數 = '';
 	if (路徑反代參數.includes('?')) {
@@ -5069,7 +5069,7 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 	const [路徑部分, ...查詢數組] = normalizedPath.split('?');
 	const 查詢部分 = 查詢數組.length ? '?' + 查詢數組.join('?') : '';
 	const 最終查詢部分 = 反代查詢參數 ? (查詢部分 ? 查詢部分 + '&' + 反代查詢參數 : '?' + 反代查詢參數) : 查詢部分;
-	config_JSON.完整節點路徑 = (路徑部分 || '/') + (路徑部分 && 路徑反代參數 ? '/' : '') + 路徑反代參數 + 最終查詢部分 + (config_JSON.啓用0RTT ? (最終查詢部分 ? '&' : '?') + 'ed=2560' : '');
+	config_JSON.完整節點路徑 = (路徑部分 || '/') + (路徑部分 && 路徑反代參數 ? '/' : '') + 路徑反代參數 + 最終查詢部分 + (config_JSON.啟用0RTT ? (最終查詢部分 ? '&' : '?') + 'ed=2560' : '');
 
 	if (!config_JSON.TLS分片 && config_JSON.TLS分片 !== null) config_JSON.TLS分片 = null;
 	const TLS分片參數 = config_JSON.TLS分片 == 'Shadowrocket' ? `&fragment=${encodeURIComponent('1,40-60,30-50,tlshello')}` : config_JSON.TLS分片 == 'Happ' ? `&fragment=${encodeURIComponent('3,1,tlshello')}` : '';
@@ -5085,7 +5085,7 @@ async function 讀取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 	config_JSON.優選訂閱生成.TOKEN = await MD5MD5(hostname + userID);
 
 	const 初始化TG_JSON = { BotToken: null, ChatID: null };
-	config_JSON.TG = { 啓用: config_JSON.TG.啓用 ? config_JSON.TG.啓用 : false, ...初始化TG_JSON };
+	config_JSON.TG = { 啟用: config_JSON.TG.啟用 ? config_JSON.TG.啟用 : false, ...初始化TG_JSON };
 	try {
 		const TG_TXT = await env.KV.get('tg.json');
 		if (!TG_TXT) {
@@ -5473,9 +5473,9 @@ async function 反代參數獲取(url, uuid) {
 			if (!鏈式代理地址.hostname || !鏈式代理地址.port) throw new Error('鏈式代理地址缺少 hostname 或 port');
 			我的SOCKS5賬號 = '';
 			反代IP = '鏈式代理';
-			啓用反代兜底 = false;
-			啓用SOCKS5全局反代 = true;
-			啓用SOCKS5反代 = String(type).toLowerCase();
+			啟用反代兜底 = false;
+			啟用SOCKS5全局反代 = true;
+			啟用SOCKS5反代 = String(type).toLowerCase();
 			parsedSocks5Address = {
 				username: 鏈式代理地址.username,
 				password: 鏈式代理地址.password,
@@ -5490,37 +5490,37 @@ async function 反代參數獲取(url, uuid) {
 	}
 
 	我的SOCKS5賬號 = searchParams.get('socks5') || searchParams.get('http') || searchParams.get('https') || searchParams.get('turn') || searchParams.get('sstp') || null;
-	啓用SOCKS5全局反代 = searchParams.has('globalproxy');
-	if (searchParams.get('socks5')) 啓用SOCKS5反代 = 'socks5';
-	else if (searchParams.get('http')) 啓用SOCKS5反代 = 'http';
-	else if (searchParams.get('https')) 啓用SOCKS5反代 = 'https';
-	else if (searchParams.get('turn')) 啓用SOCKS5反代 = 'turn';
-	else if (searchParams.get('sstp')) 啓用SOCKS5反代 = 'sstp';
+	啟用SOCKS5全局反代 = searchParams.has('globalproxy');
+	if (searchParams.get('socks5')) 啟用SOCKS5反代 = 'socks5';
+	else if (searchParams.get('http')) 啟用SOCKS5反代 = 'http';
+	else if (searchParams.get('https')) 啟用SOCKS5反代 = 'https';
+	else if (searchParams.get('turn')) 啟用SOCKS5反代 = 'turn';
+	else if (searchParams.get('sstp')) 啟用SOCKS5反代 = 'sstp';
 
 	const 解析代理URL = (值, 強制全局 = true) => {
 		const 匹配 = /^(socks5|http|https|turn|sstp):\/\/(.+)$/i.exec(值 || '');
 		if (!匹配) return false;
-		啓用SOCKS5反代 = 匹配[1].toLowerCase();
+		啟用SOCKS5反代 = 匹配[1].toLowerCase();
 		我的SOCKS5賬號 = 匹配[2].split('/')[0];
-		if (強制全局) 啓用SOCKS5全局反代 = true;
+		if (強制全局) 啟用SOCKS5全局反代 = true;
 		return true;
 	};
 
 	const 設置反代IP = (值) => {
 		反代IP = 值;
-		啓用SOCKS5反代 = null;
-		啓用反代兜底 = false;
+		啟用SOCKS5反代 = null;
+		啟用反代兜底 = false;
 	};
 
 	const 提取路徑值 = (值) => {
 		if (!值.includes('://')) {
-			const 斜槓索引 = 值.indexOf('/');
-			return 斜槓索引 > 0 ? 值.slice(0, 斜槓索引) : 值;
+			const 斜杠索引 = 值.indexOf('/');
+			return 斜杠索引 > 0 ? 值.slice(0, 斜杠索引) : 值;
 		}
 		const 協議拆分 = 值.split('://');
 		if (協議拆分.length !== 2) return 值;
-		const 斜槓索引 = 協議拆分[1].indexOf('/');
-		return 斜槓索引 > 0 ? `${協議拆分[0]}://${協議拆分[1].slice(0, 斜槓索引)}` : 值;
+		const 斜杠索引 = 協議拆分[1].indexOf('/');
+		return 斜杠索引 > 0 ? `${協議拆分[0]}://${協議拆分[1].slice(0, 斜杠索引)}` : 值;
 	};
 
 	const 查詢反代IP = searchParams.get('proxyip');
@@ -5530,14 +5530,14 @@ async function 反代參數獲取(url, uuid) {
 		let 匹配 = /\/(socks5?|http|https|turn|sstp):\/?\/?([^/?#\s]+)/i.exec(pathname);
 		if (匹配) {
 			const 類型 = 匹配[1].toLowerCase();
-			啓用SOCKS5反代 = 類型 === 'sock' || 類型 === 'socks' ? 'socks5' : 類型;
+			啟用SOCKS5反代 = 類型 === 'sock' || 類型 === 'socks' ? 'socks5' : 類型;
 			我的SOCKS5賬號 = 匹配[2].split('/')[0];
-			啓用SOCKS5全局反代 = true;
+			啟用SOCKS5全局反代 = true;
 		} else if ((匹配 = /\/(g?s5|socks5|g?http|g?https|g?turn|g?sstp)=([^/?#\s]+)/i.exec(pathname))) {
 			const 類型 = 匹配[1].toLowerCase();
 			我的SOCKS5賬號 = 匹配[2].split('/')[0];
-			啓用SOCKS5反代 = 類型.includes('sstp') ? 'sstp' : (類型.includes('turn') ? 'turn' : (類型.includes('https') ? 'https' : (類型.includes('http') ? 'http' : 'socks5')));
-			if (類型.startsWith('g')) 啓用SOCKS5全局反代 = true;
+			啟用SOCKS5反代 = 類型.includes('sstp') ? 'sstp' : (類型.includes('turn') ? 'turn' : (類型.includes('https') ? 'https' : (類型.includes('http') ? 'http' : 'socks5')));
+			if (類型.startsWith('g')) 啟用SOCKS5全局反代 = true;
 		} else if ((匹配 = /\/(proxyip[.=]|pyip=|ip=)([^?#\s]+)/.exec(pathLower))) {
 			const 路徑反代值 = 提取路徑值(匹配[2]);
 			if (!解析代理URL(路徑反代值)) return 設置反代IP(路徑反代值);
@@ -5545,21 +5545,21 @@ async function 反代參數獲取(url, uuid) {
 	}
 
 	if (!我的SOCKS5賬號) {
-		啓用SOCKS5反代 = null;
+		啟用SOCKS5反代 = null;
 		return;
 	}
 
 	try {
-		parsedSocks5Address = await 獲取SOCKS5賬號(我的SOCKS5賬號, 獲取代理默認端口(啓用SOCKS5反代));
-		if (searchParams.get('socks5')) 啓用SOCKS5反代 = 'socks5';
-		else if (searchParams.get('http')) 啓用SOCKS5反代 = 'http';
-		else if (searchParams.get('https')) 啓用SOCKS5反代 = 'https';
-		else if (searchParams.get('turn')) 啓用SOCKS5反代 = 'turn';
-		else if (searchParams.get('sstp')) 啓用SOCKS5反代 = 'sstp';
-		else 啓用SOCKS5反代 = 啓用SOCKS5反代 || 'socks5';
+		parsedSocks5Address = await 獲取SOCKS5賬號(我的SOCKS5賬號, 獲取代理默認端口(啟用SOCKS5反代));
+		if (searchParams.get('socks5')) 啟用SOCKS5反代 = 'socks5';
+		else if (searchParams.get('http')) 啟用SOCKS5反代 = 'http';
+		else if (searchParams.get('https')) 啟用SOCKS5反代 = 'https';
+		else if (searchParams.get('turn')) 啟用SOCKS5反代 = 'turn';
+		else if (searchParams.get('sstp')) 啟用SOCKS5反代 = 'sstp';
+		else 啟用SOCKS5反代 = 啟用SOCKS5反代 || 'socks5';
 	} catch (err) {
 		console.error('解析SOCKS5地址失敗:', err.message);
-		啓用SOCKS5反代 = null;
+		啟用SOCKS5反代 = null;
 	}
 }
 
